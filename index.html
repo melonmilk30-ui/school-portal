@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서울중현초등학교 학습도구</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&family=IBM+Plex+Sans+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #edf2f7;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Fixed design at 1366x768 — JS scales this */
+  .frame {
+    width: 1366px;
+    height: 768px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #2d3748;
+    background: #edf2f7;
+    display: flex;
+    flex-direction: column;
+    transform-origin: center center;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 16px 36px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 15% 50%, rgba(255,255,255,0.12) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(255,255,255,0.06) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .header h1 {
+    font-family: 'IBM Plex Sans KR', 'Noto Sans KR', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    position: relative; z-index: 1;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.15);
+  }
+
+  .search-form {
+    flex: 1; max-width: 520px;
+    position: relative; z-index: 1;
+  }
+
+  .search-form form {
+    display: flex; align-items: center;
+    background: rgba(255,255,255,0.95);
+    border-radius: 99px;
+    padding: 5px 6px 5px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  .search-form input {
+    flex: 1; border: none; outline: none;
+    font-size: 14px; font-family: 'Noto Sans KR', sans-serif;
+    color: #2d3748; background: transparent; padding: 8px 0;
+  }
+  .search-form input::placeholder { color: #a0aec0; }
+
+  .search-form button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none; border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+  .search-form button:hover { transform: scale(1.1); }
+
+  /* ── Content ── */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 32px 10px;
+  }
+
+  /* Top row: 4 sections */
+  .top-row {
+    display: flex;
+    gap: 14px;
+  }
+
+  .section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  .top-row .section { flex: 1; }
+  .top-row .section:first-child { flex: 0.7; }
+  .top-row .section:last-child { flex: 0.7; }
+
+  .section-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 2px solid #f7fafc;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .section-header h2 {
+    font-size: 13px; font-weight: 800;
+    color: #4a5568;
+  }
+
+  .grid { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  a.item {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: #2d3748;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: #f7fafc;
+    border: 1.5px solid #edf2f7;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  a.item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: #fff;
+  }
+
+  a.item .emoji { font-size: 18px; }
+  a.item span { font-size: 13px; font-weight: 600; }
+
+  .sec-search a.item:hover { border-color: #4ECDC4; }
+  .sec-tools a.item:hover { border-color: #FF6B6B; }
+  .sec-korean a.item:hover { border-color: #F6AD55; }
+  .sec-social a.item:hover { border-color: #68D391; }
+  .sec-art a.item:hover { border-color: #B794F4; }
+  .sec-coding a.item:hover { border-color: #63B3ED; }
+
+  .bottom-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; }
+
+  .footer {
+    text-align: center; padding: 6px;
+    color: #a0aec0; font-size: 11px; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="frame" id="frame">
+
+  <div class="header">
+    <h1>📚 서울중현초등학교 학습도구</h1>
+    <div class="search-form">
+      <form action="https://www.google.com/search" method="GET" target="_blank">
+        <input type="text" name="q" placeholder="구글에서 검색하기..." autocomplete="off">
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="top-row">
+      <div class="section sec-search">
+        <div class="section-header"><div class="dot" style="background:#4ECDC4"></div><h2>검색</h2></div>
+        <div class="grid">
+          <a href="https://naver.com" target="_blank" class="item"><span class="emoji">🟢</span><span>네이버</span></a>
+          <a href="https://google.com" target="_blank" class="item"><span class="emoji">🔍</span><span>구글</span></a>
+        </div>
+      </div>
+      <div class="section sec-tools">
+        <div class="section-header"><div class="dot" style="background:#FF6B6B"></div><h2>도구</h2></div>
+        <div class="grid">
+          <a href="https://www.youtube.com/" target="_blank" class="item"><span class="emoji">▶️</span><span>유튜브</span></a>
+          <a href="http://makeqr.kr/" target="_blank" class="item"><span class="emoji">📱</span><span>QR코드 만들기</span></a>
+          <a href="https://docs.google.com/drawings/d/10IWfmdMz23-zG1CgvLTUlc1GZ-HASa5aCC4piod63j4/edit" target="_blank" class="item"><span class="emoji">✏️</span><span>간단한 그림 그리기</span></a>
+        </div>
+      </div>
+      <div class="section sec-art">
+        <div class="section-header"><div class="dot" style="background:#B794F4"></div><h2>음악 & 미술</h2></div>
+        <div class="grid">
+          <a href="https://musiclab.chromeexperiments.com" target="_blank" class="item"><span class="emoji">🎵</span><span>크롬뮤직랩</span></a>
+          <a href="https://www.autodraw.com/" target="_blank" class="item"><span class="emoji">🎨</span><span>오토드로우</span></a>
+          <a href="https://artsandculture.google.com/" target="_blank" class="item"><span class="emoji">🖼️</span><span>아트앤컬쳐</span></a>
+        </div>
+      </div>
+      <div class="section sec-coding">
+        <div class="section-header"><div class="dot" style="background:#63B3ED"></div><h2>코딩 & 타자</h2></div>
+        <div class="grid">
+          <a href="https://playentry.org" target="_blank" class="item"><span class="emoji">🤖</span><span>엔트리</span></a>
+          <a href="https://www.hancomtaja.com/ko" target="_blank" class="item"><span class="emoji">⌨️</span><span>한컴타자</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-rows">
+      <div class="section sec-korean">
+        <div class="section-header"><div class="dot" style="background:#F6AD55"></div><h2>국어 & 수학</h2></div>
+        <div class="grid">
+          <a href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EC%84%9C%EC%9A%B8%EC%A4%91%ED%98%84%EC%B4%88" target="_blank" class="item"><span class="emoji">📖</span><span>중현초 도서실 도서검색</span></a>
+          <a href="https://nara-speller.co.kr/speller/" target="_blank" class="item"><span class="emoji">✅</span><span>바른 한글(맞춤법 검사기)</span></a>
+          <a href="https://ko.dict.naver.com/#/main" target="_blank" class="item"><span class="emoji">📗</span><span>국어사전(네이버)</span></a>
+          <a href="https://stdict.korean.go.kr" target="_blank" class="item"><span class="emoji">📘</span><span>표준국어대사전</span></a>
+          <a href="https://www.algeomath.kr/kids" target="_blank" class="item"><span class="emoji">📐</span><span>알지오매스 초등</span></a>
+          <a href="https://ele.tsherpa.co.kr/fortea/math-edu-tools/index.html" target="_blank" class="item"><span class="emoji">🔢</span><span>티셀파 수학교구관</span></a>
+          <a href="https://www.mathlearningcenter.org/apps" target="_blank" class="item"><span class="emoji">🧮</span><span>매쓰러닝센터 수학교구</span></a>
+        </div>
+      </div>
+      <div class="section sec-social">
+        <div class="section-header"><div class="dot" style="background:#68D391"></div><h2>사회 & 과학</h2></div>
+        <div class="grid">
+          <a href="https://www.heritage.go.kr/heri/idx/index.do" target="_blank" class="item"><span class="emoji">🏛️</span><span>국가문화유산포털</span></a>
+          <a href="https://earth.google.com/web" target="_blank" class="item"><span class="emoji">🌍</span><span>구글 어스</span></a>
+          <a href="https://kosis.kr/edu/index/index.do?sso=ok" target="_blank" class="item"><span class="emoji">📊</span><span>통계놀이터</span></a>
+          <a href="https://kosis.kr/index/index.do" target="_blank" class="item"><span class="emoji">📈</span><span>국가통계포털</span></a>
+          <a href="https://moleg.go.kr/kids" target="_blank" class="item"><span class="emoji">⚖️</span><span>법제처 어린이법제관</span></a>
+          <a href="https://stellarium-web.org/" target="_blank" class="item"><span class="emoji">⭐</span><span>스텔라리움</span></a>
+          <a href="https://www.weather.go.kr/w/index.do" target="_blank" class="item"><span class="emoji">🌤️</span><span>기상청 날씨누리</span></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">© 서울중현초등학교 과학정보부</div>
+
+</div>
+
+<script>
+  function scaleFrame() {
+    const frame = document.getElementById('frame');
+    const W = 1366, H = 768;
+    const scale = Math.min(window.innerWidth / W, window.innerHeight / H);
+    frame.style.transform = 'scale(' + scale + ')';
+  }
+  window.addEventListener('resize', scaleFrame);
+  window.addEventListener('load', scaleFrame);
+  scaleFrame();
+</script>
+
+</body>
+</html>
