@@ -257,6 +257,7 @@
     padding: 24px 26px; width: 540px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   }
+  .modal-card.narrow { width: 420px; }
   .modal-card h3 { font-size: 20px; font-weight: 800; color: #2d3748; }
   .modal-card .hint { font-size: 13px; color: #a0aec0; margin: 5px 0 16px; }
 
@@ -278,6 +279,7 @@
     padding: 10px 20px; border: none; border-radius: 9px; cursor: pointer;
   }
   .btn-ghost { background: #edf2f7; color: #4a5568; }
+  .btn-danger { background: #e53e3e; color: #fff; }
   .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
   .btn:disabled { opacity: 0.55; cursor: default; }
 </style>
@@ -416,6 +418,26 @@
     </div>
   </div>
 
+  <div class="modal" id="delModal" hidden>
+    <div class="modal-card narrow">
+      <h3>🗑️ 수업 링크 삭제</h3>
+      <p class="hint" id="delTarget"></p>
+      <form id="delForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="delPass">교사 비밀번호</label>
+            <input id="delPass" type="password" autocomplete="current-password" required>
+          </div>
+        </div>
+        <p class="modal-msg" id="delMsg"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="delCancel">취소</button>
+          <button type="submit" class="btn btn-danger" id="delSubmit">삭제하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -447,8 +469,15 @@
   const fTitle = document.getElementById('fTitle');
   const fUrl = document.getElementById('fUrl');
   const fPass = document.getElementById('fPass');
+  const delModal = document.getElementById('delModal');
+  const delForm = document.getElementById('delForm');
+  const delTarget = document.getElementById('delTarget');
+  const delMsg = document.getElementById('delMsg');
+  const delPass = document.getElementById('delPass');
+  const delSubmit = document.getElementById('delSubmit');
 
   let links = [];
+  let pendingDelete = null;
 
   function fillOptions(select, values, labelFn) {
     for (const v of values) {
@@ -514,7 +543,7 @@
       del.className = 'live-del';
       del.textContent = '✕';
       del.title = '삭제 (교사 비밀번호 필요)';
-      del.addEventListener('click', () => removeLink(link));
+      del.addEventListener('click', () => askDelete(link));
 
       wrap.append(anchor, del);
       liveList.append(wrap);
@@ -530,23 +559,43 @@
     } catch { /* 네트워크가 끊겨도 기존 목록은 그대로 둔다 */ }
   }
 
-  async function removeLink(link) {
-    const password = window.prompt('삭제하려면 교사 비밀번호를 입력하세요.');
-    if (!password) return;
+  function askDelete(link) {
+    pendingDelete = link;
+    delTarget.textContent = link.grade + '학년 ' + link.classNo + '반 ' + link.subject + ' · ' + link.title;
+    delMsg.textContent = '';
+    delPass.value = '';
+    delModal.hidden = false;
+    delPass.focus();
+  }
+
+  function closeDelete() {
+    delModal.hidden = true;
+    delPass.value = '';
+    pendingDelete = null;
+  }
+
+  delForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!pendingDelete) return;
+    delMsg.textContent = '';
+    delSubmit.disabled = true;
     try {
       const res = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'delete', id: link.id, password })
+        body: JSON.stringify({ action: 'delete', id: pendingDelete.id, password: delPass.value })
       });
       const data = await res.json();
-      if (!res.ok) { window.alert(data.error || '삭제하지 못했습니다.'); return; }
+      if (!res.ok) { delMsg.textContent = data.error || '삭제하지 못했습니다.'; return; }
       links = data.links || [];
       render();
+      closeDelete();
     } catch {
-      window.alert('네트워크 오류로 삭제하지 못했습니다.');
+      delMsg.textContent = '네트워크 오류로 삭제하지 못했습니다.';
+    } finally {
+      delSubmit.disabled = false;
     }
-  }
+  });
 
   function openModal() {
     modalMsg.textContent = '';
@@ -562,8 +611,15 @@
 
   document.getElementById('openModal').addEventListener('click', openModal);
   document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('delCancel').addEventListener('click', closeDelete);
+
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+  delModal.addEventListener('click', (e) => { if (e.target === delModal) closeDelete(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!delModal.hidden) closeDelete();
+    else if (!modal.hidden) closeModal();
+  });
 
   regForm.addEventListener('submit', async (e) => {
     e.preventDefault();
