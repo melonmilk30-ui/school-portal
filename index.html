@@ -126,7 +126,7 @@
     box-shadow: 0 1px 8px rgba(0,0,0,0.04);
     padding: 11px 16px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
     flex-shrink: 0;
   }
@@ -136,15 +136,16 @@
     display: flex; align-items: center; gap: 7px;
     font-size: 15px; font-weight: 800; color: #b7791f;
     white-space: nowrap; flex-shrink: 0;
+    padding-top: 9px;
   }
 
+  /* 가로 폭을 넘으면 아래 줄로 넘어간다. 아주 많아질 때만 세로 스크롤. */
   .live-list {
     flex: 1; min-width: 0;
-    display: flex; gap: 8px;
-    overflow-x: auto; overflow-y: hidden;
-    padding-bottom: 3px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    max-height: 194px; overflow-y: auto;
   }
-  .live-list::-webkit-scrollbar { height: 6px; }
+  .live-list::-webkit-scrollbar { width: 6px; }
   .live-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
 
   .live-item { display: flex; flex-shrink: 0; }
